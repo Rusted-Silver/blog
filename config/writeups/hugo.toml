@@ -1,0 +1,24 @@
+baseURL = 'https://rusted-silver.github.io/writeups'
+contentDir = "content/writeups"
+publishDir = "public/writeups"
+languageCode = 'en-us'
+title = 'HacktheBox WriteUps'
+theme = 'blowfish'
+
+[module]
+  [[module.mounts]]
+    source = 'content/writeups'
+    target = 'content'
+    excludeFiles = ['images/*']
+
+[homepage]
+  layout = "background" # valid options: page, profile, hero, card, background, custom
+  cardView = true
+  cardViewScreenWidth = false
+  layoutBackgroundBlur = true # only used when layout equals background
+
+[params.author]
+  name = "HacktheBox WriteUps"
+
+[menu]
+  main = []

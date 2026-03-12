@@ -1,0 +1,44 @@
+baseURL = 'https://rusted-silver.github.io/'
+contentDir = "content/main"
+publishDir = "public"
+languageCode = 'en-us'
+title = 'Ag2S'
+theme = 'hugo-coder'
+
+[module]
+  [[module.mounts]]
+    source = 'content/main/images'
+    target = 'static/images'
+  [[module.mounts]]
+    source = 'content/spellbook/images'
+    target = 'static/images'
+  [[module.mounts]]
+    source = 'content/writeups/images'
+    target = 'static/images'
+
+[params]
+  author = "Ag2S"
+  info = "Aspiring Penetration Tester | [CWEE](https://www.credly.com/badges/89af402b-7614-43f8-99c1-d8087b31ae29/public_url) | [OSCP](https://credentials.offsec.com/3b042aa7-6880-4caa-8bce-8870ca362288) | [CPTS](https://www.credly.com/badges/acdf2ace-6ba3-4ed0-8f4b-511b6f41ffeb/public_url)"
+  avatarurl = "images/ab8ca7eeaf565064024d79f15c0257ee.png"
+  colorScheme = "dark"
+  hidecolorschemetoggle = true
+
+  [[params.social]]
+    name = "HackTheBox"
+    icon = "fa fa-cube fa-2x"
+    weight = 1
+    url = "https://app.hackthebox.com/profile/2309749"
+  [[params.social]]
+    name = "LinkedIn"
+    icon = "fa-brands fa-linkedin fa-2x"
+    weight = 2
+    url = "https://www.linkedin.com/in/trungle256/"
+
+[[menu.main]]
+  name = "WriteUps"
+  weight = 1
+  url = "writeups/"
+[[menu.main]]
+  name = "SpellBook"
+  weight = 2
+  url  = "spellbook/"

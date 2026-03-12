@@ -1,0 +1,22 @@
+baseURL = "https://rusted-silver.github.io/spellbook"
+contentDir = "content/spellbook"
+publishDir = "public/spellbook"
+languageCode = 'en-us'
+title = "SpellBook"
+theme = "hugo-book"
+
+[module]
+  [[module.mounts]]
+    source = 'content/spellbook'
+    target = 'content'
+    excludeFiles = ['images/*']
+
+[params]
+  BookSection = '*'
+  BookComments = false
+  BookTheme = 'dark'
+
+[menu]
+[[menu.before]]
+  name = "<- Back to main page"
+  url = "/"
