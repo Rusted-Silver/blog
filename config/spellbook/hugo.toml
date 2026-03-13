@@ -17,6 +17,9 @@ theme = "hugo-book"
   BookTheme = 'dark'
 
 [menu]
-[[menu.before]]
-  name = "<- Back to main page"
-  url = "/"
+  [[menu.before]]
+    name = "<- Back to main page"
+    url = "https://rusted-silver.github.io/"
+  [[menu.before]]
+    name = "Welcome!"
+    url = "/"
