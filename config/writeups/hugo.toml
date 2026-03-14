@@ -1,4 +1,4 @@
-baseURL = 'https://rusted-silver.github.io/writeups'
+baseURL = 'https://ag2s.ca/writeups'
 contentDir = "content/writeups"
 publishDir = "public/writeups"
 languageCode = 'en-us'
