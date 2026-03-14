@@ -19,7 +19,7 @@ theme = "hugo-book"
 [menu]
   [[menu.before]]
     name = "<- Back to main page"
-    url = "https://rusted-silver.github.io/"
+    url = "https://ag2s.ca/"
   [[menu.before]]
     name = "Welcome!"
     url = "/"
