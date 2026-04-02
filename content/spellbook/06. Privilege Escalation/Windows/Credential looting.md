@@ -219,7 +219,7 @@ restic.exe -r E:\restic2\ restore 9971e881 --target C:\Restore
 
 ## Control pannel
 
-![](/images/26dcc6456433469d78ff3ed3c3f6ca48.png)
+![/images/53d78ccbdc747e5df2818d70c8a41e419947ad70694c7eb8369617165cbe8b05.jpeg]({{< relref "/images/53d78ccbdc747e5df2818d70c8a41e419947ad70694c7eb8369617165cbe8b05.jpeg" >}})
 Or
 
 ```cmd

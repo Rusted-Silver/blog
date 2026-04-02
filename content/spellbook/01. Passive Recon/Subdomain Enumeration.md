@@ -29,7 +29,7 @@ export PATH="$PATH:$GOPATH/bin"
 Install all tools. Documentation is [here](https://docs.projectdiscovery.io/opensource)
 
 ```sh
-sudo apt update && sudo apt install massdns libcap-dev -y
+sudo apt update && sudo apt install massdns libpcap-dev -y
 pdtm -ia
 ```
 

@@ -5,11 +5,11 @@
 Crawl and parse `js` files for more endpoints
 
 ```sh
-katana -u domain.name -jsl
-cat dpmains.txt | katana -jsl -kf all -td -d 10
+katana -u domain.name -jsl | tee -a assets.txt
+cat domains.txt | katana -jsl -kf all -td -d 10 | tee -a assets.txt
 ```
 ## ReconSpider
-> See [Reconspider]({{< relref "03. Enumeration/80,443 TCP HTTP/Scripts#reconspider" >}})
+> See [Reconspider]({{< relref "03. Web Pentesting/Scripts#reconspider" >}})
 > This tool crawl and parse html comments, links, emails, etc
 
 ```sh

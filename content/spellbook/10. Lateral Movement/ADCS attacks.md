@@ -33,8 +33,7 @@ This is the [`ESC8`](https://www.specterops.io/assets/resources/Certified_Pre-Ow
 
 It is vulnerable to NTLM relay attack . Certificate authority web enrollment usually is at `/certsrv`. Now we get the certificate from that CA.
 
-![](/images/1d2b0144797f8abbe0aa6b576a83f52a.png)
-
+![/images/0088f156de07b09ffcb79c4ee07a3ae95e494148cacc7a262ca7cae1211a7f53.jpeg]({{< relref "/images/0088f156de07b09ffcb79c4ee07a3ae95e494148cacc7a262ca7cae1211a7f53.jpeg" >}})
 ### Set relay server
 
 ```sh

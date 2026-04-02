@@ -1,8 +1,12 @@
+---
+bookCollapseSection: true
+weight: 20
+---
 # SpellBook
 
 > _“Knowledge is power.”_
 
-Welcome to **SpellBook** — a personal knowledge base dedicated to **penetration testing, offensive security, and attack research**.
+Welcome to **SpellBook**, a personal knowledge base dedicated to **penetration testing, offensive security, and attack research**.
 
 This site exists as a structured archive of techniques, experiments, scripts, and methodologies collected throughout my journey exploring how systems break. Much like the spellbooks found in fantasy worlds, this one contains a growing catalog of “spells” — practical techniques used to uncover weaknesses in systems and applications.
 
@@ -40,14 +44,6 @@ A privilege escalation path discovered during a lab.
 A bypass technique that worked once but took hours to rediscover later.
 
 Without documentation, valuable discoveries disappear into terminal history.
-
-SpellBook exists to solve that problem by turning knowledge into something **organized, searchable, and continuously refined**.
-
-```
-Research → Test → Break → Document → Refine
-```
-
-Every technique added here follows this philosophy.
 
 ---
 
