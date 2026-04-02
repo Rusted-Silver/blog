@@ -17,19 +17,19 @@ sudo virsh net-start default
 
 # Sleep off, lockscreen off
 Go to `Settings Manager`
-![/images/0087cfed585a0ba7af6ea10d8d602aac7135e11adcaa4baf6bb40e0236ff658e.jpeg]({{< relref "/images/0087cfed585a0ba7af6ea10d8d602aac7135e11adcaa4baf6bb40e0236ff658e.jpeg" >}})
+![](/images/0087cfed585a0ba7af6ea10d8d602aac7135e11adcaa4baf6bb40e0236ff658e.jpeg)
 
-![/images/5c090d71cb7e48dc92c0a1439b2a1f787c57abb51799b8154445630c49324435.jpeg]({{< relref "/images/5c090d71cb7e48dc92c0a1439b2a1f787c57abb51799b8154445630c49324435.jpeg" >}})
+![](/images/5c090d71cb7e48dc92c0a1439b2a1f787c57abb51799b8154445630c49324435.jpeg)
 
-![/images/ee6afb9f549669209ea30954cd666b7b786c13c7bc0b656379a9627f62469faf.jpeg]({{< relref "/images/ee6afb9f549669209ea30954cd666b7b786c13c7bc0b656379a9627f62469faf.jpeg" >}})
+![](/images/ee6afb9f549669209ea30954cd666b7b786c13c7bc0b656379a9627f62469faf.jpeg)
 
-![/images/3e447d8852ffb6e6990117f3fdb7dbb984186defd943a1369090077805a5b9a8.jpeg]({{< relref "/images/3e447d8852ffb6e6990117f3fdb7dbb984186defd943a1369090077805a5b9a8.jpeg" >}})
+![](/images/3e447d8852ffb6e6990117f3fdb7dbb984186defd943a1369090077805a5b9a8.jpeg)
 
-![/images/8ef7d4757b4a1459a3fc34ee13bdb8662f518a2c3fd0a7f8844eee5c9b04592d.jpeg]({{< relref "/images/8ef7d4757b4a1459a3fc34ee13bdb8662f518a2c3fd0a7f8844eee5c9b04592d.jpeg" >}})
+![](/images/8ef7d4757b4a1459a3fc34ee13bdb8662f518a2c3fd0a7f8844eee5c9b04592d.jpeg)
 
-![/images/a1c871b324bc8aadb9ae68d25bf44895efbebdbe237e753226bd301cd34c9621.jpeg]({{< relref "/images/a1c871b324bc8aadb9ae68d25bf44895efbebdbe237e753226bd301cd34c9621.jpeg" >}})
+![](/images/a1c871b324bc8aadb9ae68d25bf44895efbebdbe237e753226bd301cd34c9621.jpeg)
 
-![/images/a79d44253ceb75535732446228e601870d804187f2a2f98689d737ffc58d4e62.jpeg]({{< relref "/images/a79d44253ceb75535732446228e601870d804187f2a2f98689d737ffc58d4e62.jpeg" >}})
+![](/images/a79d44253ceb75535732446228e601870d804187f2a2f98689d737ffc58d4e62.jpeg)
 # Kali genmon IP indicator
 
 ```sh
@@ -193,16 +193,16 @@ sudo apt -y full-upgrade
 ## Setup `flameshot`
 
 Go to `Settings Manager`
-![/images/0087cfed585a0ba7af6ea10d8d602aac7135e11adcaa4baf6bb40e0236ff658e.jpeg]({{< relref "/images/0087cfed585a0ba7af6ea10d8d602aac7135e11adcaa4baf6bb40e0236ff658e.jpeg" >}})
+![](/images/0087cfed585a0ba7af6ea10d8d602aac7135e11adcaa4baf6bb40e0236ff658e.jpeg)
 
-![/images/4425a49ac00a9798ffa6cd8e95e27dcbcccdc7b8fa7fc481a3bd4ba06dfcbfa7.jpeg]({{< relref "/images/4425a49ac00a9798ffa6cd8e95e27dcbcccdc7b8fa7fc481a3bd4ba06dfcbfa7.jpeg" >}})
+![](/images/4425a49ac00a9798ffa6cd8e95e27dcbcccdc7b8fa7fc481a3bd4ba06dfcbfa7.jpeg)
 
-![/images/92f7c2e5776219aa76a8f3a91cb7c00fbb3deb2b10d98c49dd5c0761e36fb3b8.jpeg]({{< relref "/images/92f7c2e5776219aa76a8f3a91cb7c00fbb3deb2b10d98c49dd5c0761e36fb3b8.jpeg" >}})
+![](/images/92f7c2e5776219aa76a8f3a91cb7c00fbb3deb2b10d98c49dd5c0761e36fb3b8.jpeg)
 
-![/images/3db640718674728e2ac0ffb3b7d15ae536c135f0bdf1ac508cb3d2820d57be01.jpeg]({{< relref "/images/3db640718674728e2ac0ffb3b7d15ae536c135f0bdf1ac508cb3d2820d57be01.jpeg" >}})
+![](/images/3db640718674728e2ac0ffb3b7d15ae536c135f0bdf1ac508cb3d2820d57be01.jpeg)
 
 `/usr/bin/flameshot gui`
-![/images/8423e73a6d97b1049b6b864c453de39bd3b607ce98fb255af065cb1ffacd1105.jpeg]({{< relref "/images/8423e73a6d97b1049b6b864c453de39bd3b607ce98fb255af065cb1ffacd1105.jpeg" >}})
+![](/images/8423e73a6d97b1049b6b864c453de39bd3b607ce98fb255af065cb1ffacd1105.jpeg)
 # Chatgpt report
 
 ```

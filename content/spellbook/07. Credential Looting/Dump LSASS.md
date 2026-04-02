@@ -13,7 +13,7 @@ ls ass
 3. Find and right click the `Local Security Authority Process`
 4. Select `Create dump file`
 
-![/images/2c12d6d2c99b798493187852aef6f8747d23351cd122d6d3d4dc0b1097cb4dd4.jpeg]({{< relref "/images/2c12d6d2c99b798493187852aef6f8747d23351cd122d6d3d4dc0b1097cb4dd4.jpeg" >}})
+![](/images/2c12d6d2c99b798493187852aef6f8747d23351cd122d6d3d4dc0b1097cb4dd4.jpeg)
 ## CLI
 
 ### Find LSASS's PID

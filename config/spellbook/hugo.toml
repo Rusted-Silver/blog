@@ -5,8 +5,6 @@ languageCode = 'en-us'
 title = "SpellBook"
 theme = "hugo-book"
 
-refLinksErrorLevel = "WARNING"
-
 [module]
   [[module.mounts]]
     source = 'content/spellbook'
