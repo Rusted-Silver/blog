@@ -1,0 +1,24 @@
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    // Source
+    const pageKey = "checkbox:" + window.location.pathname;
+
+    const checkboxes = Array.from(
+      document.querySelectorAll('input[type="checkbox"]')
+    ).filter(cb => !cb.hasAttribute("id"));
+
+    checkboxes.forEach((checkbox, index) => {
+      checkbox.removeAttribute("disabled");
+      checkbox.style.cursor = "pointer";
+
+      // HTML5-storage manipulation here, please don't exploit :(
+      // But no XSS for you here :)
+      const saved = localStorage.getItem(`${pageKey}:${index}`);
+      if (saved === "true") checkbox.checked = true;
+
+      checkbox.addEventListener("change", () => {
+        localStorage.setItem(`${pageKey}:${index}`, checkbox.checked);
+      });
+    });
+  });
+</script>
