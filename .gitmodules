@@ -10,4 +10,4 @@
 	url = https://github.com/luizdepra/hugo-coder
 [submodule "public"]
 	path = public
-	url = git@github.com:Rusted-Silver/rusted-silver.github.io.git
+	url = git@github.com:Rusted-Silver/ag2s.ca.git
