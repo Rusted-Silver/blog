@@ -1,8 +1,4 @@
----
-bookCollapseSection: true
-weight: 20
----
-# SpellBook
+## SpellBook
 
 > _“Knowledge is power.”_
 
@@ -14,7 +10,7 @@ The purpose of this project is simple: **document everything worth remembering**
 
 ---
 
-## What This SpellBook Is
+### What This SpellBook Is
 
 SpellBook is a **living notebook of offensive security knowledge**.  
 Every page is written with the intention of being practical, reproducible, and useful during real-world testing or lab environments.
@@ -35,7 +31,7 @@ Think of it as a **grimoire for penetration testers**.
 
 ---
 
-## Why This Exists
+### Why This Exists
 
 In offensive security, knowledge accumulates quickly but is easily forgotten.
 
@@ -47,7 +43,7 @@ Without documentation, valuable discoveries disappear into terminal history.
 
 ---
 
-## A Living Document
+### A Living Document
 
 This project is **continuously evolving**.
 
@@ -64,7 +60,7 @@ A spellbook is never truly finished.
 
 ---
 
-## Disclaimer
+### Disclaimer
 
 All content in this knowledge base is intended for:
 

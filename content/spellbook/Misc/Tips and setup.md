@@ -1,21 +1,21 @@
-# Ovpn
+## Ovpn
 
 ```bash
 sudo openvpn --config ~/lab_Trungle256.ovpn > /dev/null 2>&1 &
-# Detach ovpn process out of current terminal
+## Detach ovpn process out of current terminal
 disown
 ```
 
-# Virt-manager setup
+## Virt-manager setup
 
 ```bash
-# sudo systemctl enable --now libvirtd
-# sudo systemctl enable --now virtlogd.socket
+## sudo systemctl enable --now libvirtd
+## sudo systemctl enable --now virtlogd.socket
 sudo virsh net-autostart default
 sudo virsh net-start default
 ```
 
-# Sleep off, lockscreen off
+## Sleep off, lockscreen off
 Go to `Settings Manager`
 ![](/images/0087cfed585a0ba7af6ea10d8d602aac7135e11adcaa4baf6bb40e0236ff658e.jpeg)
 
@@ -30,13 +30,13 @@ Go to `Settings Manager`
 ![](/images/a1c871b324bc8aadb9ae68d25bf44895efbebdbe237e753226bd301cd34c9621.jpeg)
 
 ![](/images/a79d44253ceb75535732446228e601870d804187f2a2f98689d737ffc58d4e62.jpeg)
-# Kali genmon IP indicator
+## Kali genmon IP indicator
 
 ```sh
 sh -c 'ip -o -4 addr show "$([ -d /sys/class/net/tun0 ]&&echo tun0||echo eth0)"|awk "{print \$2\": \" \$4}"|cut -d/ -f1'
 ```
 
-# Docker setup
+## Docker setup
 
 ```sh
 sudo apt update && sudo apt install docker.io containerd docker-compose -y
@@ -50,13 +50,13 @@ Test. No need privilege since we are in docker group. After this, should log out
 docker run hello-world
 ```
 
-## Quick MySQL
+### Quick MySQL
 
 ```sh
 docker run -p 3306:3306 -e MYSQL_USER='db' -e MYSQL_PASSWORD='db-password' -e MYSQL_DATABASE='db' -e MYSQL_ROOT_PASSWORD='db' --mount type=bind,source="$(pwd)/db.sql",target=/docker-entrypoint-initdb.d/db.sql mysql
 ```
 
-# Terminal logging
+## Terminal logging
 
  Terminal logging, `script`. with `-fqa` flag, it basically allows you to log multiple terminal in one file, at the same time.
 
@@ -72,7 +72,7 @@ sed -E 's/\x1b\[H|\x1b\[2J|\x1b\[3J//g' typescript > clean.txt
 
 > Basically, when you do `clear`, it just prints these special characters as terminators that clear your screen. So when you log your terminal, those special characters is in the log file, and when you `cat` it out, the same special characters will again, clear your screen
 
-# Quick docker
+## Quick docker
 
 ```sh
 sudo apt update && sudo apt install docker.io docker-compose containerd -y
@@ -86,7 +86,7 @@ Test. No need privilege since we are in `docker` group. After this, should log o
 docker run hello-world
 ```
 
-# Tmux
+## Tmux
 
 `[CTRL + B]` as command prefix
 
@@ -94,13 +94,13 @@ docker run hello-world
 
 `[CTRL + B] + [` To "scroll"
 
-## "Windows"
+### "Windows"
 
 `[CTRL + B] C` create another "window"
 
 `[CTRL + B] 0` switch to "window" number 0
 
-## Split
+### Split
 
 `[CTRL + B] %` Horizontal split
 
@@ -108,11 +108,11 @@ docker run hello-world
 
 `[CTRL + B]` + directional key up down right left to switch
 
-## Rename
+### Rename
 
 `[CTRL + B] ,` To rename current "window"
 
-## Session
+### Session
 
 `[CTRL + B] D` Detach the current `tmux` session
 
@@ -124,7 +124,7 @@ docker run hello-world
 
 `tmux kill-session -t <session number or name>` Kill session
 
-# CVE search
+## CVE search
 
 [CVEdetails](https://www.cvedetails.com/)
 
@@ -136,61 +136,61 @@ docker run hello-world
 
 [NIST](https://nvd.nist.gov/vuln/search?execution=e2s1)
 
-# Quick shell
+## Quick shell
 
 https://www.revshells.com/
 
-# Quick hash crack
+## Quick hash crack
 
 https://crackstation.net/
 
-# Packages
+## Packages
 
 ```sh
-# https://github.com/projectdiscovery/pdtm
+## https://github.com/projectdiscovery/pdtm
 sudo apt update && sudo apt install golang-go -y
 go install -v github.com/projectdiscovery/pdtm/cmd/pdtm@latest
 
-# https://vscodium.com/
+## https://vscodium.com/
 wget -qO - https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/raw/master/pub.gpg \
     | gpg --dearmor \
     | sudo dd of=/usr/share/keyrings/vscodium-archive-keyring.gpg
 echo 'deb [arch=amd64,arm64 signed-by=/usr/share/keyrings/vscodium-archive-keyring.gpg] https://download.vscodium.com/debs vscodium main' \
     | sudo tee /etc/apt/sources.list.d/vscodium.list
 
-# https://cloudsmith.io/~kong/repos/insomnia/setup/#formats-deb
-# Since they don't have package for kali, we spoof to ubuntu focal, works
-# Related issue: https://github.com/Kong/insomnia/issues/6990
+## https://cloudsmith.io/~kong/repos/insomnia/setup/#formats-deb
+## Since they don't have package for kali, we spoof to ubuntu focal, works
+## Related issue: https://github.com/Kong/insomnia/issues/6990
 curl -1sLf \
   'https://packages.konghq.com/public/insomnia/setup.deb.sh' \
   | sudo -E distro=ubuntu codename=focal arch=amd64 component=main bash
 
-# Install useful packages
+## Install useful packages
 sudo apt update
 sudo apt install -y seclists jq python3-scrapy feroxbuster rlwrap faketime ntpsec-ntpdate hurl
 pipx install git+https://github.com/Esonhugh/Gopherus3.git
 pipx install flask-unsign
 pipx install git-dumper
-# Password vault apps, if found password file 
+## Password vault apps, if found password file 
 sudo apt install -y keepassxc passwordsafe
-# Good for reporting
+## Good for reporting
 sudo apt install -y obsidian flameshot
 
-# Install codium (vscode but open source)
+## Install codium (vscode but open source)
 sudo apt install -y codium
 
-# Install insomnia (API testing client)
+## Install insomnia (API testing client)
 sudo apt install -y insomnia
 
-# Install all ProjectDiscovery tools
+## Install all ProjectDiscovery tools
 sudo apt install -y massdns libpcap-dev
 pdtm -ia
 
-# Full kali upgrade
+## Full kali upgrade
 sudo apt -y full-upgrade
 ```
 
-## Setup `flameshot`
+### Setup `flameshot`
 
 Go to `Settings Manager`
 ![](/images/0087cfed585a0ba7af6ea10d8d602aac7135e11adcaa4baf6bb40e0236ff658e.jpeg)
@@ -203,7 +203,7 @@ Go to `Settings Manager`
 
 `/usr/bin/flameshot gui`
 ![](/images/8423e73a6d97b1049b6b864c453de39bd3b607ce98fb255af065cb1ffacd1105.jpeg)
-# Chatgpt report
+## Chatgpt report
 
 ```
 Hi, can you please help me write a report for a penetration test session? I will describe the finding, and you will help me write each section of the finding.
