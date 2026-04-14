@@ -80,18 +80,3 @@ From here, we have to right-click on the chosen snap-in and choose `Change Domai
 
 ![](/images/ea08889470f43747697926df6b9790708aca6064a6544664ceb8d5197c4c7357.jpeg)
 
-## Powershell
-
-Get every properties in an AD group
-
-```powershell
-Get-ADGroup -Identity "Administrators" -Properties *
-```
-
-Enumerate users in `Administrators` group
-
-```powershell
-(Get-ADGroup -identity "Administrators" -Properties *).Members.Count
-(Get-ADGroup -identity "Administrators" -Properties *).Members
-Get-ADGroup -identity "Administrators" -Properties * | Select Members | fl
-```

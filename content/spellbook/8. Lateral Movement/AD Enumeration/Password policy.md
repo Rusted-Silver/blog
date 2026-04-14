@@ -1,6 +1,6 @@
 >Can skip this part if you know for sure there is no account lockout policy
 
-## Linux Attacker
+## From Linux
 
 ### `netexec`
 
@@ -38,7 +38,7 @@ rpcclient $> getdompwinfo
 ldapsearch -h $target -x -b "DC=INLANEFREIGHT,DC=LOCAL" -s sub "*" | grep -m 1 -B 10 pwdHistoryLength
 ```
 
-## Domain joined Windows
+## From Domain joined Windows
 
 ### `net.exe`
 

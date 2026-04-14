@@ -23,3 +23,6 @@ theme = "hugo-book"
   [[menu.before]]
     name = "Welcome!"
     url = "/"
+
+[markup.goldmark.renderer]
+  unsafe = true

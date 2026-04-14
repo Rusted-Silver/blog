@@ -1,6 +1,6 @@
 # Deleted objects
 
-## From `Powershell`
+## From Windows
 
 Query everything of deleted object
 

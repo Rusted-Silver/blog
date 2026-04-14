@@ -5,7 +5,7 @@
 > 
 > Needs current pwned account to be able to add 10 computer accounts to the domain
 
-## uhh
+## Install tool
 
 ```sh
 git clone https://github.com/Ridter/noPac.git

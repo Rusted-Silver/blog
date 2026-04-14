@@ -1,4 +1,4 @@
-See [Relay Potato]({{< relref "8. Lateral Movement/Relay Potato#relay-potato" >}}) too
+See [Relay Potato]({{< relref "6. Privilege Escalation/Windows/Relay Potato#relay-potato" >}}) too
 ## Monitor processes
 
 > Windows have a lot of options to pass credential straight into command line

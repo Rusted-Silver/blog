@@ -1,6 +1,6 @@
 ## Extract credential from `lsass.exe`
 
-See [Credentials in Memory]({{< relref "7. Credential Looting/Credentials in Memory#lsa" >}})
+See [Credentials in Memory]({{< relref "7. Post Exploitation/Credentials in Memory#lsa" >}})
 
 ## RCE as SYSTEM
 

